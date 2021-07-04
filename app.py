@@ -313,3 +313,5 @@ most_important_features= obs_to_explain(X_validation.iloc[obs,:],
                               shap_values = shap_values[obs].values ,n=8)
 print(most_important_features)
 print(X_validation.iloc[obs,:])
+
+# https://medium.com/dataman-in-ai/the-waterfall-plots-for-the-shap-values-of-all-models-245afc0aa8ec
