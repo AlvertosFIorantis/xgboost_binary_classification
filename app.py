@@ -160,7 +160,7 @@ X_test = one_hot_encoding_test(X_test, True)
 
 
 
-'''aysian optimization'''
+'''Baysian optimization'''
 
 from datetime import datetime
 def timer(start_time=None):
