@@ -1,6 +1,5 @@
 from pandas import DataFrame
 import datetime
-
 import pandas as pd
 import matplotlib.colors as mcolors
 from sklearn.metrics import confusion_matrix, classification_report
