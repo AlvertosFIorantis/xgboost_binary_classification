@@ -213,7 +213,7 @@ xgb_bo = BayesianOptimization(xgb_evaluate,
 
 #%%
 start_time = timer(None) # timing starts from this point for "start_time" variableper
-xgb_bo.maximize(init_points=25, n_iter=20, acq='ei')
+xgb_bo.maximize(init_points=10, n_iter=5, acq='ei')
 timer(start_time) # timing ends here for "start_time" variable
 
 #%%
@@ -249,5 +249,67 @@ print(accuracy_score(Y_validation,valid_y_pred))
 print(confusion_matrix(Y_validation, valid_y_pred))
 
 
+import shap
+explainer  = shap.Explainer(bst,X_validation)
+shap_values = explainer(X_validation)
 
-#%%
+shap.summary_plot(shap_values, X_validation)
+
+obs = 10
+#10 the recrod in the X_validation
+base_value = Y_train.mean()
+shap_values_observation = shap_values[obs]
+def obs_to_explain(data,base_value ,shap_values,n):
+        '''
+          - data: the observation. It is a Pandas series. The index contains the variable names 
+          - shap_values: the shap_values for the above observation 
+          - base_value: the base_value, which is the expected value or the mean of the target value of the training set
+          - green_color: the color for the up bar
+          - red_color: the color for the down bar
+          - for_plot: a sorted data frame by the absolute value of shape in descending order
+          - n: show the top n (default) variables. The rest variables are summed up into "others"
+        '''
+        for_plot = pd.DataFrame({'data':np.round(data,2),
+                                 'shap':shap_values,
+                                 'shap_abs': np.abs(shap_values),
+                                 'label': data.index
+                                })
+        for_plot = for_plot.sort_values(by='shap_abs',ascending=False)
+
+        # Split the variables into n and the rest. Only show the top n
+        for_plot1 = for_plot.iloc[0:n,:]
+        for_plot2 = for_plot.iloc[n:,:]
+
+        # Sum up the rest as 'others'
+        rest = pd.DataFrame({'data': '','shap':for_plot2['shap'].sum(), 'label': 'Others'},index=['others'])
+        for_plot = for_plot1.append(rest)
+
+        # Sum up the rest into 'others'
+        base = pd.DataFrame({'data': np.round(base_value,2),'shap':base_value, 'label': 'Base value'},index=['base_value'])
+        for_plot = base.append(for_plot)
+
+        for_plot['blank'] = for_plot['shap'].cumsum().shift(1).fillna(0) # +  base_value
+        for_plot['label'] = for_plot['label'] + " =" + for_plot['data'].map(str) 
+        for_plot = for_plot.drop(['data','shap_abs'],axis=1)
+        
+
+        
+        return(for_plot ) 
+    
+#n = number of most important features
+most_important_features= obs_to_explain(X_validation.iloc[obs,:],
+                              base_value = base_value,
+                              shap_values = rf_shap_values[obs],n=8)
+
+
+#####################
+
+
+#Check that the values matches the values in the plot
+obs=10
+shap.plots.waterfall(shap_values[obs])
+most_important_features= obs_to_explain(X_validation.iloc[obs,:],
+                              base_value = shap_values[obs].base_values,
+                              shap_values = shap_values[obs].values ,n=8)
+print(most_important_features)
+print(X_validation.iloc[obs,:])
