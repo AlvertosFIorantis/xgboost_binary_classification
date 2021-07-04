@@ -258,15 +258,7 @@ obs = 10
 base_value = Y_train.mean()
 shap_values_observation = shap_values[obs]
 def obs_to_explain(data,base_value ,shap_values,n):
-        '''
-          - data: the observation. It is a Pandas series. The index contains the variable names 
-          - shap_values: the shap_values for the above observation 
-          - base_value: the base_value, which is the expected value or the mean of the target value of the training set
-          - green_color: the color for the up bar
-          - red_color: the color for the down bar
-          - for_plot: a sorted data frame by the absolute value of shape in descending order
-          - n: show the top n (default) variables. The rest variables are summed up into "others"
-        '''
+    
         for_plot = pd.DataFrame({'data':np.round(data,2),
                                  'shap':shap_values,
                                  'shap_abs': np.abs(shap_values),
