@@ -112,7 +112,7 @@ def one_hot_encoding_test(test_dataset, normalize=False):
         numeric_columns = list(test_dataset.select_dtypes(
             include="number").columns.values)
         scaler = joblib.load('scaler.pkl')
-        test_dataset[numeric_columns] = scaler.fit_transform(
+        test_dataset[numeric_columns] = scaler.transform(
             test_dataset[numeric_columns])
     import pickle
     '''Process the unseen (test) data!'''
