@@ -383,15 +383,6 @@ print(X_validation.iloc[obs,:])
 
 
 
-# %%
-''''
-Converting log odds to probabilties
-'''
-explainerModel_prob = shap.TreeExplainer(bst,data = X_train)
-
-shap_values_model_prob  = explainerModel_prob.shap_values(X_train)
-
- 
 
 
  
@@ -401,15 +392,6 @@ shap_values_model_prob  = explainerModel_prob.shap_values(X_train)
 explainerModel_prob=shap.TreeExplainer (bst, data = X_train)
 with open('explainer.pkl', 'wb') as f:
     pickle.dump(explainerModel_prob, f)
-
-
-with open('explainer.pkl', 'rb') as f:
-    explainer_loaded = pickle.load(f)
-shap_values_model_prob = explainer_loaded.shap_values (X_test)
-
-
-test_dmatrix = xgb.DMatrix(data=X_test, label=Y_test)
-final_predictions= bst.predict(test_dmatrix)
 
 
 #########################################################
@@ -485,11 +467,11 @@ for j in range(X_test.shape[0]):
     DSS_dataframe = pd.DataFrame([DSS_dictionary_output])
     #Try to convert the row to json instead of creating new columns
     DSS_dataframe.astype(str)
-    row_json_similar_to_DSS = DSS_dataframe.to_json(orient='records')[1:-1].replace('},{', '} {')
-    row_json_similar_to_DSS_clean = row_json_similar_to_DSS.replace("/", "_")
-    row_json_similar_to_DSS_clean = row_json_similar_to_DSS_clean.replace("\\", "")
+    row_json_similar_to_JSON_FOR_JAVACRIPT = DSS_dataframe.to_json(orient='records')[1:-1].replace('},{', '} {')
+    row_json_similar_to_JSON_FOR_JAVACRIPT_clean = row_json_similar_to_JSON_FOR_JAVACRIPT.replace("/", "_")
+    row_json_similar_to_JSON_FOR_JAVACRIPT_clean = row_json_similar_to_JSON_FOR_JAVACRIPT_clean.replace("\\", "")
     #Need to convert the predcition to score by using the deciles
-    row_list=[model_prediction,row_json_similar_to_DSS_clean]
+    row_list=[model_prediction,row_json_similar_to_JSON_FOR_JAVACRIPT_clean]
     row_df = pd.DataFrame([row_list],columns=['PROBABILITY', 'explanations'],dtype=str) # i foce all columns to be strings helps with the json
     Production_dataframe = Production_dataframe.append(row_df, ignore_index=True)
     #to mono pou alaka einai to eplaantions edo kai pano pou ftiaxno proti fora to dataframe apo kefalea se mikra
@@ -543,7 +525,7 @@ Production_dataframe[ "PROBABILITY"]= Production_dataframe[ "PROBABILITY"].astyp
 
 
 
-### I do that so i can have the shap values fo all the test dataset into 1 dictiaonry just the total
+
 # adding the values with common key
 
 dict1={}
@@ -567,9 +549,13 @@ DSS_dictionary_output = dict((k, combined_dictionary[k]) for k in main_keys if k
 DSS_dataframe = pd.DataFrame([DSS_dictionary_output])
 #Try to convert the row to json instead of creating new columns
 DSS_dataframe.astype(str)
-row_json_similar_to_DSS = DSS_dataframe.to_json(orient='records')[1:-1].replace('},{', '} {')
-row_json_similar_to_DSS_clean = row_json_similar_to_DSS.replace("/", "_")
-row_json_similar_to_DSS_clean = row_json_similar_to_DSS_clean.replace("\\", "")
+row_json_similar_to_JSON_FOR_JAVACRIPT = DSS_dataframe.to_json(orient='records')[1:-1].replace('},{', '} {')
+row_json_similar_to_JSON_FOR_JAVACRIPT_clean = row_json_similar_to_JSON_FOR_JAVACRIPT.replace("/", "_")
+row_json_similar_to_JSON_FOR_JAVACRIPT_clean = row_json_similar_to_JSON_FOR_JAVACRIPT_clean.replace("\\", "")
+
+
+############## Combine the dataset final to pandas
+Production_dataframe["final_shap"]=row_json_similar_to_JSON_FOR_JAVACRIPT_clean
 
 
 
